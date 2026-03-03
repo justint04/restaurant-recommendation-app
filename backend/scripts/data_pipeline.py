@@ -28,6 +28,7 @@ def run_pipeline(address):
     if not place_details:
         print("Failed to get place details")
         return
+    
     print(f"place_details: {place_details}")
 
     try:
@@ -60,7 +61,6 @@ def run_pipeline(address):
            place_details.get("name"),
            place_info.get("address"),
            place_details.get("rating"),
-           place_details.get("total_ratings"),
            place_details.get("business_status"),
            place_details.get("formatted_address"),
            place_details.get("editorial_summary"),
@@ -69,17 +69,41 @@ def run_pipeline(address):
            place_details.get("serves_vegetarian_food"),
        )
         )
-        
+
+        reviews = place_details.get("reviews, []")
+        for review in reviews:
+            cur.execute(
+                """
+                INSERT INTO reviews (
+                    place_id,
+                    author_name,
+                    rating,
+                    text,
+                    translated
+                )
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT DO NOTHING
+                """,
+                (
+                    place_id,
+                    review.get("author_name"),
+                    review.get("rating"),
+                    review.get("text"),
+                    review.get("translated")
+                )
+            )
         conn.commit()
-        print(f"Rows affected: {cur.rowcount}") # should be 1
-        cur.close()
-        conn.close()
-        print("Data inserted successfully")
+        print(f"Inserted restaurant and {len(reviews)} reviews")
     
     except Exception as e:
         print(f"DATABASE ERROR: {e}")
         traceback.print_exc()
         conn.rollback()
+
+    finally:
+        print("Data inserted successfully")
+        cur.close()
+        conn.close()
 
 if __name__ == "__main__":
     run_pipeline(address)
