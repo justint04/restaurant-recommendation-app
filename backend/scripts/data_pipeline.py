@@ -42,7 +42,6 @@ def run_pipeline(address):
                 name,
                 address,
                 rating,
-                total_ratings,
                 business_status,
                 formatted_address,
                 editorial_summary,
@@ -50,7 +49,7 @@ def run_pipeline(address):
                 url,
                 serves_vegetarian_food
         )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (place_id) DO UPDATE SET
             name = EXCLUDED.name,
             address = EXCLUDED.address,
@@ -70,7 +69,7 @@ def run_pipeline(address):
        )
         )
 
-        reviews = place_details.get("reviews, []")
+        reviews = place_details.get("reviews") or []
         for review in reviews:
             cur.execute(
                 """
