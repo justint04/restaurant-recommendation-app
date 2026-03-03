@@ -1,0 +1,9 @@
+how user input works
+
+they will input city and zipcode
+they will also have clickable boxes for dietary restrictions like dairy free, vegan, ect.
+they wll have clickable boxes for cuisine options
+price range will use the google price_level which is rated from 0-4
+
+text keyword search will pull reviews, match keywords and score them, and rank restaurants
+based on this review

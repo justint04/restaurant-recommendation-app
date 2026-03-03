@@ -1,0 +1,46 @@
+2/25/26
+Project status- I am able to search for a place based on it's location by inputting
+the address in the text. the database is also connected.
+
+next steps- figure out how to get review data and data about the place by looking through
+the google maps platform docs, then place the data into the database.
+basically, figure out which search function to call
+
+
+figure out a way for localhost to run without calling the api, turn on with a button
+
+IP- in progress D- Done
+Project Setup (D)
+1. project initialization
+2. google cloud setup
+3. postgresql setup
+
+Database testing & API Integration
+4. implement place search integration 
+5. implement place details integration  (IP)
+6. database insert logic
+
+Text preprocessing & Feature Engineering
+7. text preprocessing module
+8. keyword dictionary design
+9. keyword matching engine
+10. sentiment scoring & category aggregation
+
+Ranking algorithm implementation
+11. weighted linear scoring
+12. sorting and ranking logic
+13. performance testing
+API endpoints & Backend Routing
+
+14. build search endpoint
+15. build ranking endpoint
+16. error handling 
+
+Frontend
+17. build search page UI
+18. Results page
+19. Styling & Basic UX
+
+Testing
+20. End to end testing
+21. Documentation
