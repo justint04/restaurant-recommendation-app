@@ -10,14 +10,15 @@ basically, figure out which search function to call
 figure out a way for localhost to run without calling the api, turn on with a button
 
 IP- in progress D- Done
+
 Project Setup (D)
 1. project initialization
 2. google cloud setup
 3. postgresql setup
 
-Database testing & API Integration
+Database testing & API Integration (D)
 4. implement place search integration 
-5. implement place details integration  (IP)
+5. implement place details integration  
 6. database insert logic
 
 Text preprocessing & Feature Engineering

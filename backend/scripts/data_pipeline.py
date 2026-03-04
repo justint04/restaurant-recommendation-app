@@ -107,5 +107,5 @@ def run_pipeline(address):
 if __name__ == "__main__":
     run_pipeline(address)
 
-#run using python data_pipeline.py in console
+#run using python -m backend.scripts.data_pipeline
 #for now we will use address but it should be input from a website in the future
