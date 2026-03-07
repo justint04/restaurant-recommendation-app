@@ -3,6 +3,8 @@ import traceback
 from dotenv import load_dotenv
 from backend.api.google_client import get_place_info, get_place_details
 from backend.database.db_connection import get_connection
+from backend.processing.text_processor import process_text
+from backend.processing.scorer import score_review
 
 load_dotenv()
 
@@ -71,6 +73,10 @@ def run_pipeline(address):
 
         reviews = place_details.get("reviews") or []
         for review in reviews:
+            words = process_text(review.get("text") or "")
+            score = score_review(words)
+            print(f"{review.get('author_name')}: {score}")
+
             cur.execute(
                 """
                 INSERT INTO reviews (
@@ -78,9 +84,10 @@ def run_pipeline(address):
                     author_name,
                     rating,
                     text,
-                    translated
+                    translated,
+                    score
                 )
-                VALUES (%s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s)
                 ON CONFLICT DO NOTHING
                 """,
                 (
@@ -88,7 +95,8 @@ def run_pipeline(address):
                     review.get("author_name"),
                     review.get("rating"),
                     review.get("text"),
-                    review.get("translated")
+                    review.get("translated"),
+                    score
                 )
             )
         conn.commit()
@@ -103,7 +111,7 @@ def run_pipeline(address):
         print("Data inserted successfully")
         cur.close()
         conn.close()
-
+                         
 if __name__ == "__main__":
     run_pipeline(address)
 
