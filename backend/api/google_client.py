@@ -36,7 +36,7 @@ def get_place_info(address, api_key) :
 def get_place_details(place_id, api_key) :
     
     base_url = "https://maps.googleapis.com/maps/api/place/details/json"
-
+    
     params = {
         "place_id": place_id,
         "fields": "business_status,formatted_address,name,editorial_summary,photos,price_level,rating,reviews,url,serves_vegetarian_food",
@@ -55,7 +55,7 @@ def get_place_details(place_id, api_key) :
     
     place = data["result"]
 
-    #figure out how to add photos
+
     return {
         "business_status": place.get("business_status"),
         "formatted_address": place.get("formatted_address"),
