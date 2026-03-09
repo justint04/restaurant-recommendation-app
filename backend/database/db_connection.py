@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+#connect to postgresql database using psycopg2, and gets credentials from env file
 def get_connection():
     return psycopg2.connect(   
         dbname=os.getenv("DB_NAME"),

@@ -1,3 +1,2 @@
 # restaurant-recommendation-app
 This project is a website that has the goal of recommending the best restaurants to users based on their preferences. It does this through analyzing user reviews from Google Places API, matching them with a keyword database. Key features include smart rating of restaurants, sort by keyword such as "vegetarian", "kosher". For this project we will be using React for the frontend, PostgreSQL for the database, and python for the backend.
-

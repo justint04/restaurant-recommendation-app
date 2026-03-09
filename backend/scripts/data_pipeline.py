@@ -7,10 +7,12 @@ from backend.processing.text_processor import process_text
 from backend.processing.scorer import score_review
 
 load_dotenv()
-
+#for now i am using address as my input, however it should be through my react website
+#when i code it 
 api_key = os.getenv("GOOGLE_PLACES_API_KEY")
 address = "Rubys Cafe SOHO"
 
+#this function runs the data pipeline
 def run_pipeline(address):
     print("start pipeline")
     
@@ -18,12 +20,14 @@ def run_pipeline(address):
         print("ERROR: GOOGLE_PLACES_API_KEY not found in environment")
         return
     
+    #get a place_info api request and store the information
     place_info = get_place_info(address, api_key)
     if not place_info:
         print("ERROR: Failed to get place info- check API KEY or address")
         return
     print(f"place_info: {place_info}")
 
+    #get a place_details api request and store the information
     place_id = place_info["place_id"]
     place_details = get_place_details(place_id, api_key)
 
@@ -32,7 +36,7 @@ def run_pipeline(address):
         return
     
     print(f"place_details: {place_details}")
-
+    #connect to postgresql database and insert it into restaurants table
     try:
         conn = get_connection()
         cur = conn.cursor()
@@ -71,12 +75,16 @@ def run_pipeline(address):
        )
         )
 
+        #extract reviews from place details api call
         reviews = place_details.get("reviews") or []
+
+        #for every review in our reviews, process the text into keywords and score each review
         for review in reviews:
             words = process_text(review.get("text") or "")
             score = score_review(words)
             print(f"{review.get('author_name')}: {score}")
 
+        #insert information that comes with each review into our reviews table
             cur.execute(
                 """
                 INSERT INTO reviews (
@@ -99,6 +107,7 @@ def run_pipeline(address):
                     score
                 )
             )
+        #commit the inserts into our database
         conn.commit()
         print(f"Inserted restaurant and {len(reviews)} reviews")
     
