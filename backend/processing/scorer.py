@@ -59,12 +59,16 @@ def score_review(keywords):
     scores["total"] = sum(scores.value())
     return scores
     
-#this sums each review's scores, since each restaurant has 5 reviews
-def score_restaurant(reviews):  
-    if not reviews:
-        return 0
-    total = sum(score_review(review) for review in reviews)
-    return total / len(reviews)
+def score_restaurant_by_category(all_review_scores):
+    #takes a list of per review scores and sum them up per category
+
+    restaurant_scores = {"food": 0, "service": 0, "ambiance": 0, "value": 0, "total": 0}
+
+    for review_score in all_review_scores:
+        for category in restaurant_scores:
+            restaurant_scores[category] += review_score.get(category, 0)
+
+    return restaurant_scores
 
 
         
