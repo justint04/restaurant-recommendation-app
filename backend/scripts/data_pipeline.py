@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from backend.api.google_client import get_place_info, get_place_details
 from backend.database.db_connection import get_connection
 from backend.processing.text_processor import process_text
-from backend.processing.scorer import score_review
+from backend.processing.scorer import score_review_by_category, score_restaurant_by_category
 
 load_dotenv()
 #for now i am using address as my input, however it should be through my react website
@@ -77,12 +77,14 @@ def run_pipeline(address):
 
         #extract reviews from place details api call
         reviews = place_details.get("reviews") or []
+        all_review_scores = []
 
         #for every review in our reviews, process the text into keywords and score each review
         for review in reviews:
             words = process_text(review.get("text") or "")
-            score = score_review(words)
-            print(f"{review.get('author_name')}: {score}")
+            scores = score_review_by_category(words)
+            all_review_scores.append(scores)
+            print(f"{review.get('author_name')}: {scores}")
 
         #insert information that comes with each review into our reviews table
             cur.execute(
@@ -93,9 +95,13 @@ def run_pipeline(address):
                     rating,
                     text,
                     translated,
-                    score
+                    score_food,
+                    score_service,
+                    score_ambiance,
+                    score_value,
+                    score_total
                 )
-                VALUES (%s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT DO NOTHING
                 """,
                 (
@@ -104,12 +110,21 @@ def run_pipeline(address):
                     review.get("rating"),
                     review.get("text"),
                     review.get("translated"),
-                    score
+                    scores["food"],
+                    scores["service"],
+                    scores["ambiance"],
+                    scores["value"],
+                    scores["total"],
                 )
             )
+
+        #score all the restaurants by category and store in restaurant_scores
+        restaurant_scores = score_restaurant_by_category(all_review_scores) 
+
         #commit the inserts into our database
         conn.commit()
         print(f"Inserted restaurant and {len(reviews)} reviews")
+        print(f"Restaurant scores: {restaurant_scores}")
     
     except Exception as e:
         print(f"DATABASE ERROR: {e}")
@@ -120,7 +135,7 @@ def run_pipeline(address):
         print("Data inserted successfully")
         cur.close()
         conn.close()
-                         
+                
 if __name__ == "__main__":
     run_pipeline(address)
 
