@@ -45,14 +45,19 @@ CATEGORY_KEYWORDS = {
 #this compares every word in words to our list of negative and positive keywords
 #+1 for each positive, +1 for each negative
 
-def score_review(words):
-    score = 0
-    for word in words:
-        if word in POSITIVE_KEYWORDS:
-            score += 1
-        elif word in NEGATIVE_KEYWORDS:
-            score -= 1
-        return score
+def score_review(keywords):
+    #takes a list of keywords from process_text 
+    #returns a dict with score per category and total
+
+    scores = {"food": 0, "service": 0, "ambiance": 0, "value": 0}
+
+    for word in keywords:
+        for category, keyword_map in CATEGORY_KEYWORDS.items():
+            if word in keyword_map:
+                scores[category] += keyword_map[word]
+    
+    scores["total"] = sum(scores.value())
+    return scores
     
 #this sums each review's scores, since each restaurant has 5 reviews
 def score_restaurant(reviews):  
