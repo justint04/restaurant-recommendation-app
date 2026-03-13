@@ -69,6 +69,14 @@ def search_restaurants_by_location(query, api_key):
         })
     return results
 
+PRICE_MAP = {
+    "PRICE_LEVEL_FREE": 0,
+    "PRICE_LEVEL_INEXPENSIVE": 1,
+    "PRICE_LEVEL_MODERATE": 2,
+    "PRICE_LEVEL_EXPENSIVE": 3,
+    "PRICE_LEVEL_VERY_EXPENSIVE": 4
+}
+
 def get_place_details(place_id, api_key) :
     #place details url from google places documentation
     base_url = f"https://places.googleapis.com/v1/places/{place_id}"
