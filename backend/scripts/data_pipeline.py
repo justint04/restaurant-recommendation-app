@@ -107,9 +107,9 @@ def run_pipeline(address):
                 """,
                 (
                     place_id,
-                    review.get("author_name"),
+                    review.get("authorAttribution", {}).get("displayName"),
                     review.get("rating"),
-                    review.get("text"),
+                    review.get("text", {}).get("text"),
                     review.get("translated"),
                     scores["food"],
                     scores["service"],
