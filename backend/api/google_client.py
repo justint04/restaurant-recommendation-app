@@ -3,6 +3,37 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+def get_place_info(address, api_key) :
+    #Base URL
+    base_url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json"
+
+    #these are the parameters we want to retrieve from a place info call
+    params = {
+        "input": address,
+        "inputtype": "textquery", 
+        "fields": "formatted_address,name,business_status,place_id",
+        "key": api_key, 
+    }
+    #Send request and capture response
+    response = requests.get(base_url, params=params)
+
+    #Check if request was successful
+    if response.status_code != 200:
+        return None
+    
+    data = response.json()
+
+    if data["status"] != "OK" or not data["candidates"]:
+        return None
+    
+    place = data["candidates"][0]
+
+    #return the results of our place_info call 
+    return {
+        "name": place["name"],
+        "address": place["formatted_address"],
+        "place_id":place["place_id"]
+    }
 
 #core part of our project, user should be able to type a query like "indian food in brooklyn"
 #this will help us achieve that
