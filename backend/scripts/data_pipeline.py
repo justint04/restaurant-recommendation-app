@@ -1,7 +1,7 @@
 import os
 import traceback
 from dotenv import load_dotenv
-from backend.api.google_client import get_place_info, get_place_details
+from backend.api.google_client import get_place_details, search_restaurants_by_location
 from backend.database.db_connection import get_connection
 from backend.processing.text_processor import process_text
 from backend.processing.scorer import score_review_by_category, score_restaurant_by_category
@@ -13,6 +13,39 @@ api_key = os.getenv("GOOGLE_PLACES_API_KEY")
 address = "Rubys Cafe SOHO"
 
 #this function runs the data pipeline
+
+def get_place_info(address, api_key) :
+    #Base URL
+    base_url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json"
+
+    #these are the parameters we want to retrieve from a place info call
+    params = {
+        "input": address,
+        "inputtype": "textquery", 
+        "fields": "formatted_address,name,business_status,place_id",
+        "key": api_key, 
+    }
+    #Send request and capture response
+    response = requests.get(base_url, params=params)
+
+    #Check if request was successful
+    if response.status_code != 200:
+        return None
+    
+    data = response.json()
+
+    if data["status"] != "OK" or not data["candidates"]:
+        return None
+    
+    place = data["candidates"][0]
+
+    #return the results of our place_info call 
+    return {
+        "name": place["name"],
+        "address": place["formatted_address"],
+        "place_id":place["place_id"]
+    }
+
 def run_pipeline(address):
     print("start pipeline")
     

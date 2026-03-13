@@ -17,7 +17,8 @@ def search_restaurants_by_location(query, api_key):
 
     body = {
         "textQuery": query,
-        "includedType": "restaurant"
+        "includedType": "restaurant",
+        "maxResultCount": 5
     }
 
     response = requests.post(base_url, headers=headers, json=body)
