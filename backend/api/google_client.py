@@ -3,6 +3,15 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+
+PRICE_MAP = {
+    "PRICE_LEVEL_FREE": 0,
+    "PRICE_LEVEL_INEXPENSIVE": 1,
+    "PRICE_LEVEL_MODERATE": 2,
+    "PRICE_LEVEL_EXPENSIVE": 3,
+    "PRICE_LEVEL_VERY_EXPENSIVE": 4
+}
+
 def get_place_info(address, api_key) :
     #Base URL
     base_url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json"
@@ -69,13 +78,6 @@ def search_restaurants_by_location(query, api_key):
         })
     return results
 
-PRICE_MAP = {
-    "PRICE_LEVEL_FREE": 0,
-    "PRICE_LEVEL_INEXPENSIVE": 1,
-    "PRICE_LEVEL_MODERATE": 2,
-    "PRICE_LEVEL_EXPENSIVE": 3,
-    "PRICE_LEVEL_VERY_EXPENSIVE": 4
-}
 
 def get_place_details(place_id, api_key) :
     #place details url from google places documentation
@@ -98,7 +100,7 @@ def get_place_details(place_id, api_key) :
         "formatted_address": place.get("formattedAddress"),
         "name": place.get("displayName", {}).get("text"),
         "editorial_summary": place.get("editorialSummary", {}).get("text"),
-        "price_level": place.get("priceLevel"),
+        "price_level": PRICE_MAP.get(place.get("priceLevel")),
         "rating": place.get("rating"),
         "reviews": place.get("reviews", []),
         "url": place.get("googleMapsUri"),

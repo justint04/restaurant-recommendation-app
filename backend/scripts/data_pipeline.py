@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from backend.api.google_client import get_place_info, get_place_details, search_restaurants_by_location
 from backend.database.db_connection import get_connection
 from backend.processing.text_processor import process_text
-from backend.processing.scorer import score_review_by_category, score_restaurant_by_category
+from backend.processing.scorer import score_review, score_restaurant_by_category
 
 load_dotenv()
 #for now i am using address as my input, however it should be through my react website
@@ -65,7 +65,7 @@ def run_pipeline(address):
        (
            place_id,
            place_details.get("name"),
-           place_info.get("address"),
+           place_details.get("formatted_address"),
            place_details.get("rating"),
            place_details.get("business_status"),
            place_details.get("formatted_address"),
@@ -83,7 +83,7 @@ def run_pipeline(address):
         #for every review in our reviews, process the text into keywords and score each review
         for review in reviews:
             words = process_text(review.get("text") or "")
-            scores = score_review_by_category(words)
+            scores = score_review(words)
             all_review_scores.append(scores)
             print(f"{review.get('author_name')}: {scores}")
 
@@ -203,7 +203,7 @@ def run_location_search(query):
 
             for review in reviews:
                 words = process_text(review.get("text") or "")
-                scores = score_review_by_category(words)
+                scores = score_review(words)
                 all_review_scores.append(scores)
 
                 cur.execute(
@@ -264,7 +264,7 @@ def run_location_search(query):
     return results
 
 if __name__ == "__main__":
-    run_location_search("coffee shops soho nyc")
+    run_pipeline(address)
 
 #run using python -m backend.scripts.data_pipeline
 
