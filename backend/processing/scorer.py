@@ -56,7 +56,7 @@ def score_review(keywords):
             if word in keyword_map:
                 scores[category] += keyword_map[word]
     
-    scores["total"] = sum(scores.value())
+    scores["total"] = sum(scores.values())
     return scores
     
 def score_restaurant_by_category(all_review_scores):

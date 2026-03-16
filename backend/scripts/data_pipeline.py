@@ -82,10 +82,10 @@ def run_pipeline(address):
 
         #for every review in our reviews, process the text into keywords and score each review
         for review in reviews:
-            words = process_text(review.get("text") or "")
+            words = process_text(review.get("text", {}).get("text") or "")
             scores = score_review(words)
             all_review_scores.append(scores)
-            print(f"{review.get('author_name')}: {scores}")
+            print(f"{review.get('authorAttribution', {}).get('displayName')}: {scores}")
 
         #insert information that comes with each review into our reviews table
             cur.execute(
@@ -202,10 +202,10 @@ def run_location_search(query):
             all_review_scores = []
 
             for review in reviews:
-                words = process_text(review.get("text") or "")
+                words = process_text(review.get("text", {}).get("text") or "")
                 scores = score_review(words)
                 all_review_scores.append(scores)
-
+    
                 cur.execute(
                     """
                     INSERT INTO reviews (
