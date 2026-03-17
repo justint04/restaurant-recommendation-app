@@ -5,6 +5,7 @@ async function search() {
     displayResults(data)
 }
 
+/*
 function displayResults(restaurants) {
     const html = restaurants.map((r, index) => `
         <div class="card">
@@ -22,3 +23,4 @@ function displayResults(restaurants) {
     
     document.getElementById("results").innerHTML = html
 }
+*/
