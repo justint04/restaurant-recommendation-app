@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang ="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Restaurant Recommender - Results</title>
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --cream: #f5f0e8;
+                --ink: #1a1208;
+                --rust: #c4451a;
+                --gold: #d4a847;
+                --sage: #6b7f5e;
+                --muted: #8a7e6e;
+                --card-bg: #fdfaf4;
+                --border: #e2d9c8;
+            }
+
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+
+            body {
+                background: var(--cream);
+                color: var(--ink);
+                font-family: 'DM Sans', sans-serif;
+                min-height: 100vh;
+            }
+
+            /*noise texture overlay */
+            body::before {
+                content: '';
+                position: fixed;
+                inset: 0;
+                background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            header {
+                padding: 2rem 3rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                border-bottom: 1px solid var(--border);
+                position: relative;
+                z-index: 1;
+            }
+
+            .logo {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--rust);
+                letter-spacing: -0.02em;
+            }
+
+            .search-bar {
+                display: flex;
+                gap: 0.5rem;
+                flex: 1;
+                max-width: 500px;
+                margin: 0 3rem;
+            }
+
+            .search-bar input {
+                flex: 1;
+                padding: 0.65rem 1.2rem;
+                border: 1.5px solid var(--border);
+                border-radius: 2px;
+                background: white;
+                font-family: 'DM Sans', sans-serif;
+                font-size: 0.9rem;
+                color: var(--ink);
+                outline: none;
+                transition: border-color 0.2s;
+            }
+
+            .search-bar input:focus {
+                border-color: var(--rust);
+            }
+
+            .search-bar button {
+                padding: 0.65rem 1.4rem;
+                background: var(--rust); 
+                color: white;
+                border: none;
+                border-radius: 2px;
+                font-family: 'DM Sans', sans-serif;
+                font-size: 0.85rem;
+                font-weight: 500;
+                cursor: pointer;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+                transition: background 0.2s;
+            }
+
+            .search-bar button:hover {
+                background: #a83915;
+            }
+
+            main {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 3rem 2rem;
+                position: relative;
+                z-index: 1;
+            }
+
+            .results-header {
+                margin-bottom: 2.5rem;
+            }
+
+            .results-header h1 {
+                font-family: 'Playfair Display', serif;
+                font-size: 2rem;
+                font-weight: 400;
+                color: var(--ink);
+                margin-bottom: 0.4rem;
+            }
+
+            .results-meta {
+                font-size: 0.85rem;
+                color: var(--muted);
+                font-weight: 300;
+            }
+
+            /*loading state*/
+            .loading {
+                text-align: center;
+                padding: 5rem 0;
+            }
+
+            .loading-spinner {
+                width: 36px;
+                height: 36px;
+                border: 2.5px solid var(--border);
+                border-top-color: var(--rust);
+                border-radius: 50%;
+                animation: spin 0.8s linear infinite;
+                margin: 0 auto 1.2rem;
+            }
+
+            @keyframes spin { to { transform: rotate(360deg); } }
+
+            .loading p {
+                color: var(--muted);
+                font-size: 0.9rem;
+            }
+
+            /*restaurant cards*/
+            .restaurant-list {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .restaurant-card {
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                padding: 2rem;
+                display: grid;
+                grid-template-columns: auto 1fr;
+                gap: 1.5rem;
+                opacity: 0;
+                transform: translateY(16px);
+                animation: fadeUp 0.4s ease forwards;
+                transition: box-shadow 0.25s, transform 0.25s;
+            }
+
+            .restaurant-card:hover {
+                box-shadow: 0 8px 32px rgba(26,18,8,0.08);
+                transform: translateY(-2px);
+            }
+
+            .restaurant-card:hover {
+                box-shadow: 0 8px 32px rgba(26,18,8,0.08);
+                transform: translateY(-2px);
+            }
+
+            @keyframes fadeUp {
+                to { opacity; transform: translateY(0); }
+            }
+
+            .rank-badge {
+                width: 48px;
+                height: 48px;
+                background: var(--ink);
+                color: var(--cream);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: 'Playfair Display', serif;
+                font-size: 1.1rem;
+                font-weight: 700;
+                flex-shrink: 0;
+                margin-top: 0.2rem;
+            }
+
+            .rank-badge.top {
+                background: var(--rust);
+            }
+
+            .card-body {
+                min-width: 0;
+            }
+
+            .card-top {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                margin-bottom: 0.4rem;
+                gap: 1rem;
+            }
+
+            .restaurant-name {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.3rem;
+                font-weight: 700;
+                color: var(--ink);
+                line-height: 1.2;
+            }
+
+            .total-score {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                flex-shrink: 0;
+            }
+
+            .total-score .score-num {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.8rem;
+                font-weight: 700;
+                color: var(--rust);
+                line-height: 1;
+            }
+
+            .total-score .score-label {
+                font-size: 0.7rem;
+                color: var(--muted);
+                text-transform: uppercase;   
+            }
+
+            .restaurant-meta {
+                display: flex;
+                gap: 1rem;
+                margin-bottom: 1.2rem;
+                font-size: 0.82rem;
+                color: var(--muted);
+                flex-wrap: wrap;
+            }
+
+            .meta-item {
+                display: flex;
+                align-items: center;
+                gap: 0.3rem;
+            }
+
+            .meta-item .dot {
+                width: 3px;
+                height: 3px;
+                background: var(--border);
+                border-radius: 50%;
+            }
+
+            .stars {
+                color: var(--gold);
+                font-size: 0.85rem;
+            }
+
+            .price {
+                color: var(--sage);
+                font-weight: 500;
+            }
+
+            /*category scores*/
+            .category-scores {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.8rem;
+            }
+
+            .category {
+                background: white;
+                border: 1px solid var(--border);
+                border-radius: 3px;
+                padding: 0.7rem 0.8rem;
+            }
+
+            .category-label {
+                font-size: 0.68rem;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                color: var(--muted);
+                margin-bottom: 0.4rem;
+                font-weight: 500;
+            }
+
+            .category-score {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.4rem;
+                font-weight: 700;
+                line-height: 1;
+            }
+
+            .category-score.positive { color: var(--sage); }
+            .category-score.negative { color: var(--rust); }
+            .category-score.neutral { color: var(--muted); }
+
+            .score-bar {
+                height: 2px;
+                background: var(--border);
+                border-radius: 1px;
+                margin-top: 0.5rem;
+                overflow: hidden;
+            }
+
+            .score-bar-fill {
+                height: 100%;
+                border-radius: 1px;
+                transition: width 0.5s ease;
+            }
+
+            .score-bar-fill.positive { background: var(--sage); }
+            .score-bar-fill.negative { background: var(--rust); }
+
+            /* empty or error state */
+            .empty-state {
+                text-align: center;
+                padding: 5rem 0;
+            }
+
+            .empty-state h2 {
+                font-family: 'PLayfair Display', serif;
+                font-size: 1.5rem;
+                font-weight: 400;
+                margin-bottom: 0.8rem;
+                color: var(--ink);
+            }
+
+            .empty-state p {
+                color: var(--muted);
+                font-size: 0.9rem;
+            }
+
+            @media (max-width: 640px) {
+                header { flex-direction: column; gap: 1rem; padding: 1.5rem; }
+                .search-bar { margin: 0; max-width: 100%; width: 100%; }
+                .category-scores { grid-template-columns: repeat(2, 1fr); }
+                .card-top { flex-direction: column; }
+            }
+        </style>
+    </head>
+    <body>
+
+        <header>
+            <div class="logo">Restaurant Recommender</div>
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="pizza near brooklyn..." />
+                <button onclick="search()">Search</button>
+            </div>
+        </header>
+
+        <main>
+            <div class="results-header">
+                <h1 id="results-table">Find your next <em>favoite</em></h1>
+                <p class="results-meta" id="results-meta">Search above to discover top-rated restaurants</p>
+            </div>
+
+            <div id=""results-container"></div>
+        </main>
+        
+    </body>
+</html>
