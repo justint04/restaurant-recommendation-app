@@ -180,7 +180,7 @@
             }
 
             @keyframes fadeUp {
-                to { opacity; transform: translateY(0); }
+                to { opacity: 1; transform: translateY(0); }
             }
 
             .rank-badge {
@@ -370,8 +370,151 @@
                 <p class="results-meta" id="results-meta">Search above to discover top-rated restaurants</p>
             </div>
 
-            <div id=""results-container"></div>
+            <div id="results-container"></div>
         </main>
+<script>
+    const PRICE_LABELS = { 0: 'FREE', 1: '$', 2:'$$', 3: '$$$', 4: '$$$$' }
+    //when page is loaded, check for query parameters ex: results.html?query=pizza+brooklyn
+    window.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search)
+        const query = params.get('query')
+        if (query) {
+            document.getElementById('search-input').value = query
+            fetchResults(query)
+        }
+    })
+
+    function search() {
+        const query = document.getElementById('search-input').value.trim()
+        if (!query) return
+        //update url so page can be shared
+        window.history.pushState({}, '', `?query=${encodeURIComponent(query)}`)
+        fetchResults(query)
+    }
+    //allow pressing enter to search
+    document.getElementById('search-input').addEventListener('keydown', e=> { 
+        if (e.key === 'Enter') search()
+    })
+
+    async function fetchResults(query) {
+        const container = document.getElementById('results-container')
+        const title = document.getElementById('results-title')
+        const meta = document.getElementById('results-meta')
+    
+
+    //show loading state
+    container.innerHTML = `
+        <div class="loading">
+            <div class="loading-spinner"></div>
+            <p>Finding the best spots</p>
+        </div>
+    `
+    title.innerHTML = `Results for <em>${query}</em>`
+    meta.textContent = 'Searching'
+
+    try {
+        const res = await fetch(`http://localhost:5000/api/search?query=${encodeURIComponent(query)}`)
+        const data = await res.json()
+
+        if (!data || data.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h2>No results found</h2>
+                    <p>Try a different search- "pasta in manhattan" or "brunch in soho"</p>
+                    </div>
+            `
+            meta.textContent = '0 restaurants found'
+            return
+        }
+
+        meta.textContent = `${data.length} restaurant${data.length !== 1 ? 's' : ''}
+ranked by review score`
+        renderResults(data)
+
+    }  catch (err) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <h2>Someting went wrong</h2>
+                <p>Make sure your flask server is running on port 5000.</p>
+            </div>
+        `
+        meta.textContent = 'Error loading results'
+        }
+    }
+
+    function renderResults(restaurants) {
+        const container = document.getElementById('results-container')
+        const maxScore = Math.max(...restaurants.map(r => Math.abs(r.scores?.total || 0)), 1)
+
+        container.innerHTML = `<div class="restaurant-list">${restaurants.map((r, i) => renderCard(r, i, maxScore)).join('')}</div>`
         
-    </body>
+        //stagger card animations
+        document.querySelectorAll('.restaurant-card').forEach((card, i) => {
+            card.style.animationDelay =`${i * 0.08}s`
+        })
+
+        //animate score bars before card appearance
+        setTimeout(() => {
+            document.querySelectorAll('.score-bar-fill').forEach(bar => { 
+                bar.style.width = bar.dataset.width
+            })
+        }, 300)
+    }
+
+    function renderCard(r, index, maxScore) {
+        const scores = r.scores || {}
+        const categories = [
+            {key: 'food',   label: 'Food    '},
+            {key: 'service',   label: 'Service    '},
+            {key: 'ambiance',   label: 'Ambiance    '},
+            {key: 'value',   label: 'Value    '},
+        ]
+
+        const categoryHTML = categories.map(c => {
+            const val = scores[c.key] ?? 0
+            const cls = val > 0 ? 'positive' : val < 0 ? 'negative' : 'neutral'
+            const barPct = Math.min(Math.abs(val) / maxScore * 100, 100)
+            const sign = val > 0 ? '+' : ''
+            return `
+                 <div class="category">
+                    <div class="category-label">${c.label}</div>
+                    <div class="category-score ${cls}">${sign}${val}</div>
+                    <div class="score-bar">
+                        <div class="score-bar-fill ${val >= 0 ? 'positive' : 'negative'}" 
+                             style="width: 0%" 
+                             data-width="${barPct}%">
+                        </div>
+                    </div>
+                </div>
+            `
+        }).join('')
+
+        const stars = r.rating ? '*'.repeat(Math.round(r.rating)) + '☆'.repeat(5-Math.round(r.rating)) : ''
+        const price = r.price_level != null ? PRICE_LABELS[r.price_level] || '' : ''
+        const total = scores.total ?? 0
+        const totalSign = total > 0 ? '+' : ''
+
+        return `
+            <div class="restaurant-card">
+                <div class="rank-badge ${index === 0 ? 'top' : ''}">${index + 1}</div>
+                <div class="card-body">
+                    <div class="card-top">
+                        <div class="restaurant-name">${r.name || 'Unknown'}</div>
+                        <div class="total-score">
+                            <div class="score-num">${totalSign}${total}</div>
+                            <div class="score-label">Review Score</div>
+                        </div>
+                    </div>
+                    <div class="restaurant-meta">
+                        ${r.rating ? `<span class="meta-item"><span class="stars">${stars}</span> ${r.rating}</span>` : ''}
+                        ${price ? `<span class="meta-item"><span class="dot"></span><span class="price">${price}</span></span>` : ''}
+                        ${r.address ? `<span class="meta-item"><span class="dot"></span>${r.address}</span>` : ''}
+                    </div>
+                    <div class="category-scores">${categoryHTML}</div>
+                </div>
+            </div>
+        `
+    }
+</script>
+</body>
 </html>
