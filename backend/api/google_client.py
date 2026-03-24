@@ -52,7 +52,7 @@ def search_restaurants_by_location(query, api_key):
     headers = {
         "Content-Type": "application/json",
         "X-Goog-Api-key": api_key,
-        "X-Goog-Field-Mask": "places.id,places.displayName,places.formattedAddress, places.rating"  
+        "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.priceLevel"  
     }
 
     body = {

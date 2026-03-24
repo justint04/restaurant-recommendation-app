@@ -27,18 +27,18 @@ Text preprocessing & Feature Engineering (D)
 9. keyword matching engine
 10. sentiment scoring & category aggregation
 
-Ranking algorithm implementation 
+Ranking algorithm implementation (D)
 11. weighted linear scoring
 12. sorting and ranking logic
 13. performance testing
 
-API endpoints & Backend Routing
+API endpoints & Backend Routing (D)
 
 14. build search endpoint
 15. build ranking endpoint
 16. error handling 
 
-Frontend
+Frontend (D)
 17. build search page UI
 18. Results page
 19. Styling & Basic UX

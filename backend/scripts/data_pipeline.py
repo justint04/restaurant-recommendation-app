@@ -191,6 +191,7 @@ def run_location_search(query):
                     place_details.get("formatted_address"),
                     place_details.get("rating"),
                     place_details.get("business_status"),
+                    place_details.get("formatted_address"),
                     place_details.get("editorial_summary"),
                     place_details.get("price_level"),
                     place_details.get("url"),
@@ -237,16 +238,16 @@ def run_location_search(query):
                     )
                 )
 
-                restaurant_scores = score_restaurant_by_category(all_review_scores)
-                conn.commit()
-                print(f"Inserted {place_details.get('name')} with {len(reviews)} reviews")
+            restaurant_scores = score_restaurant_by_category(all_review_scores)
+            conn.commit()
+            print(f"Inserted {place_details.get('name')} with {len(reviews)} reviews")
 
-                results.append({
-                    "name": place_details.get("name"),
-                    "address": place_details.get("formatted_address"),
-                    "rating": place_details.get("rating"),
-                    "scores": restaurant_scores
-                })
+            results.append({
+                "name": place_details.get("name"),
+                "address": place_details.get("formatted_address"),
+                "rating": place_details.get("rating"),
+                "scores": restaurant_scores
+            })
 
         except Exception as e:
             print(f"DATABASE ERROR for {place['name']}: {e}")
@@ -264,7 +265,7 @@ def run_location_search(query):
     return results
 
 if __name__ == "__main__":
-    run_pipeline(address)
+    run_location_search(address)
 
 #run using python -m backend.scripts.data_pipeline
 
