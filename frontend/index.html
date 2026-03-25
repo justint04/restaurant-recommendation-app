@@ -4,17 +4,340 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Restaurant Finder</title>
-        <link rel="stylesheet" href="style.css">
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --cream: #f5f0e8;
+                --ink: #1a1208;
+                --rust: #c4451a;
+                --gold: #d4a847;
+                --sage: #6b7f5e;
+                --muted: #8a7e6e;
+                --border: #e2d9c8;
+            }
+
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+
+            body {
+                background: var(--cream);
+                color: var(--ink);
+                font-family: 'DM Sans', sans-serif;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /*noise texture overlay */
+            body::before {
+                content: '';
+                position: fixed;
+                inset: 0;
+                background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            header {
+                padding: 2rem 3rem;
+                border-bottom: 1px solid var(--border);
+                position: relative;
+                z-index: 1;
+            }
+
+            .logo {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--rust);
+                letter-spacing: -0.02em;
+            }
+
+            /*hero section*/
+            main {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 4rem 2rem;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero {
+                max-width: 640px;
+                width: 100;
+                text-align: center;
+            }
+
+            .hero-eyebrow {
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 0.16em;
+                color: var(--rust);
+                font-weight: 500;
+                margin-bottom: 1.2rem;
+                opacity: 0;
+                animation: fadeUp 0.5s ease 0.1s forwards;
+            }
+
+            .hero h1 {
+                font-family: 'Playfair Display', serif;
+                font-size: clamp(2.4rem, 6vw, 3.8rem);
+                font-weight: 400;
+                line-height: 1.15;
+                color: var(--ink);
+                margin-bottom: 1.2rem;
+                opacity: 0;
+                animation: fadeUp 0.5s ease 0.2s forwards;
+            }
+
+            .hero h1 em {
+                font-style: italic;
+                color: var(--rust);
+            }
+
+            .hero-sub {
+                font-size: 1rem;
+                color: var(--muted);
+                font-weight: 300;
+                line-height: 1.6;
+                margin-bottom: 2.5rem;
+                opacity: 0;
+                animation: fadeUp 0.5s ease 0.3s forwards;
+            }
+
+            /* search */
+            .search-wrap {
+                opacity: 0;
+                animation: fadeUp 0.5s ease 0.4s forwards;
+            }
+
+            .search-bar {
+                display: flex;
+                gap: 0;
+                width: 100;
+                border: 1.5px solid var(--border);
+                border-radius: 3px;
+                overflow: hidden;
+                background: white;
+                transition: border-color 0.2s, box-shadow 0.2s;
+            }
+
+            .search-bar:focus-widthin {
+                border-color: var(--rust);
+                box-shadow: 0 4px 20px rgba(196,69,26,0.1);
+            }
+
+            .search-bar input {
+                flex: 1;
+                padding: 1rem 1.4rem;
+                border: none;
+                background: transparent;
+                font-family: 'DM Sans', sans-serif;
+                font-size: 1rem;
+                color: var(--ink);
+                outline: none;
+            }
+
+            .search-bar input::placeholder {
+                color: #b5a898;
+            }
+
+            .search-bar button {
+                padding: 1rem 1.8rem;
+                background: var(--rust);
+                color: white;
+                border: none;
+                font-family: 'DM Sans', sans-serif;
+                font-size: 0.82rem;
+                font-weight: 500;
+                cursor: pointer;
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+                transition: background 0.2s;
+                white-space: nowrap;
+            }
+
+            .search-bar button:hover {
+                background: #a83915;
+            }
+
+            /* suggestions */
+            .suggestions {
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 1.2rem;
+                opacity: 0;
+                animation: fadeUp 0.5s ease 0.5s forwards;
+            }
+
+            .suggestion-pill {
+                padding: 0.35rem 0.9rem;
+                border: 1px solid var(--border);
+                border-radius: 20px;
+                font-size: 0.8rem;
+                color: var(--muted);
+                cursor: pointer;
+                background: white;
+                transition: all 0.2s;
+                font-family: 'DM Sans', sans-serif;
+            }
+
+            .suggestion-pill:hover {
+                border-color: var(--rust);
+                color: var(--rust);
+                background: #fdf6f3;
+            }
+
+            /*decorative divider*/
+            .divider {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                margin: 3.5rem 0 2.5rem;
+                opacity: 0;
+                animation: fadeUp 0.5s ease 0.6s forwards;
+            }
+
+            .divider-line {
+                flex: 1;
+                height: 1px;
+                background: var(--border);
+            }
+
+            .divider-text {
+                font-size: 0.72rem;
+                text-transform: uppercase;
+                letter-spacing: 0.12em;
+                color: var(--muted);
+            }
+
+            /* feature pill */
+            .features {
+                display: flex;
+                gap: 1.5rem;
+                justify-content: center;
+                flex-wrap: wrap;
+                opacity: 0;
+                animation: fadeUp 0.5s ease 0.7s forwards;
+            }
+
+            .feature {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.82rem;
+                color: var(--muted);
+            }
+
+            .feature-icon {
+                width: 24px;
+                height: 24px;
+                background: white;
+                border: 1px solid var(--border);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.75rem;
+            }
+
+            footer {
+                padding: 1.5rem 3rem;
+                border-top: 1px solid var(--border);
+                text-align: center;
+                font-size: 0.78rem;
+                color: var(--muted);
+                position: relative;
+                z-index: 1;
+            }
+
+            @keyframes fadeUp {
+                from { opacity: 0; transform: translateY(12px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+
+            @media (max-width: 480px) {
+                header { padding: 1.5rem; }
+                .search-bar button { padding: 1rem 1.2rem; }
+                .features { gap: 1rem; }
+            }
+        </style>
     </head>
     <body>
-        <div class="container">
-            <h1>Find a Restaurant</h1>
+
+        <header>
+            <div class="logo">Restaurant Finder</div>
+        </header>
+<main>
+    <div class="hero">
+        <p class="hero-eyebrow">Restaurant Discovery</p>
+        <h1>Find your next<br><em>favorite</em> restaurant</h1>
+        <p class="hero-sub">Search by cuisine or neighborhood.<br>We rank restaurants by review sentiment.</p>
+
+        <div class="search-wrap">
             <div class="search-bar">
-                <input type="text" id="search-input" placeholder="e.g Ruby's Cafe SoHo">
+                <input
+                    type="text";
+                    id="'search-input"
+                    placeholder="e.g. pizza near brooklyn, brunch in soho..."
+                    autocomplete="off"
+                />
                 <button onclick="search()">Search</button>
             </div>
-            <div id="results"></div>
+            <div class="suggestions">
+                <span class="'suggestion-pill" onclick="fillSearch('best pastas NYC')">best pasta NYC</span>
+                <span class="'suggestion-pill" onclick="fillSearch('brunch soho')">brunch soho</span>
+                <span class="'suggestion-pill" onclick="fillSearch('ramen east village')">ramen east village</span>
+                <span class="'suggestion-pill" onclick="fillSearch('pizza near brooklyn')">pizza near brooklyn</span>
+            </div>
         </div>
-        <script src="app.js"></script>
-    </body>
+        
+        <div class="divider">
+            <div class="divider-line"></div>
+            <span class="divider-text">How it works</span>
+            <div class="divider-line"></div>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon"></div>
+                <span>Search any location</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon"></div>
+                <span>Reviews analyzed</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon"></div>
+                <span>Ranked by score</span>
+            </div>
+        </div>
+    </div>
+</main>
+<footer>
+    RestaurantFinder- powered by Google Places &amp; review sentiment scoring
+</footer>
+
+<script>
+    function search() {
+        const query = document.getElementById('search-input').value.trim()
+        if (!query) return
+        window.location.href = `results.html?query=${encodeURIComponent(query)}`
+    }
+
+    function fillSearch(text) {
+        document.getElementById('search-input').value = text
+        document.getElementById('search-input').focus()
+    }
+
+    document.getElementById('search-input').addEventListener('keydown', e => { 
+        if (e.key === 'Enter') search()
+    })
+
+</script>
+
+</body>
 </html>
