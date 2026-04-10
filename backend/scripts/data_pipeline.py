@@ -160,7 +160,8 @@ def run_location_search(query):
         if not place_details:
             print(f"Skipping {place['name']} - could not get details")
             continue
-
+        conn = None
+        cur = None
         try:
             conn = get_connection()
             cur = conn.cursor()
