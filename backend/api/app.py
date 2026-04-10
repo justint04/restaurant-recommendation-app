@@ -7,6 +7,10 @@ import os
 app = Flask(__name__)
 CORS(app)
 
+@app.route("/api/health", methods=["GET"])
+def health():
+    return jsonify({"status": "ok"}), 200
+
 @app.route("/api/search", methods=["GET"])
 def search():
     query = request.args.get("query")
