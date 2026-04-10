@@ -350,7 +350,6 @@
         </style>
     </head>
     <body>
-
         <header>
             <div class="logo">Restaurant Recommender</div>
             <div class="search-bar">
@@ -408,7 +407,7 @@
     meta.textContent = 'Searching'
 
     try {
-        const res = await fetch(`http://localhost:5000/api/search?query=${encodeURIComponent(query)}`)
+        const res = await fetch(`https://restaurant-api-jnge.onrender.com/api/search?query=${encodeURIComponent(query)}`)
         const data = await res.json()
 
         if (!data || data.length === 0) {
@@ -429,7 +428,7 @@ ranked by review score`
     }  catch (err) {
         container.innerHTML = `
             <div class="empty-state">
-                <h2>Someting went wrong</h2>
+                <h2>Something went wrong</h2>
                 <p>Make sure your flask server is running on port 5000.</p>
             </div>
         `
