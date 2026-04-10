@@ -65,7 +65,7 @@
 
             .hero {
                 max-width: 640px;
-                width: 100;
+                width: 100%;
                 text-align: center;
             }
 
@@ -123,7 +123,7 @@
                 transition: border-color 0.2s, box-shadow 0.2s;
             }
 
-            .search-bar:focus-widthin {
+            .search-bar:focus-within {
                 border-color: var(--rust);
                 box-shadow: 0 4px 20px rgba(196,69,26,0.1);
             }
@@ -280,18 +280,18 @@
         <div class="search-wrap">
             <div class="search-bar">
                 <input
-                    type="text";
-                    id="'search-input"
+                    type="text"
+                    id="search-input"
                     placeholder="e.g. pizza near brooklyn, brunch in soho..."
                     autocomplete="off"
                 />
                 <button onclick="search()">Search</button>
             </div>
             <div class="suggestions">
-                <span class="'suggestion-pill" onclick="fillSearch('best pastas NYC')">best pasta NYC</span>
-                <span class="'suggestion-pill" onclick="fillSearch('brunch soho')">brunch soho</span>
-                <span class="'suggestion-pill" onclick="fillSearch('ramen east village')">ramen east village</span>
-                <span class="'suggestion-pill" onclick="fillSearch('pizza near brooklyn')">pizza near brooklyn</span>
+                <span class="suggestion-pill" onclick="fillSearch('best pasta NYC')">best pasta NYC</span>
+                <span class="suggestion-pill" onclick="fillSearch('brunch soho')">brunch soho</span>
+                <span class="suggestion-pill" onclick="fillSearch('ramen east village')">ramen east village</span>
+                <span class="suggestion-pill" onclick="fillSearch('pizza near brooklyn')">pizza near brooklyn</span>
             </div>
         </div>
         
