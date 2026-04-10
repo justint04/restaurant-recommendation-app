@@ -407,7 +407,7 @@
     meta.textContent = 'Searching'
 
     try {
-        const res = await fetch(`https://restaurant-api.onrender.com/api/search?query=${encodeURIComponent(query)}`)
+        const res = await fetch(`https://restaurant-api-jnge.onrender.com/api/search?query=${encodeURIComponent(query)}`)
         const data = await res.json()
 
         if (!data || data.length === 0) {
