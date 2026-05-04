@@ -43,6 +43,6 @@ Frontend (D)
 18. Results page
 19. Styling & Basic UX
 
-Testing
+Testing (D)
 20. End to end testing
 21. Documentation
